@@ -2,14 +2,21 @@ package com.demo.mytestnotificationlistner
 
 import android.app.NotificationChannel
 import android.app.NotificationManager
+import android.content.ComponentName
 import android.content.Intent
 import android.os.Build
 import android.os.Bundle
+import android.os.Handler
+import android.os.Looper
+import android.provider.Settings
+import android.util.Log
 import android.view.Menu
 import android.view.MenuItem
 import android.view.View
 import android.widget.Button
 import android.widget.TextView
+import android.widget.Toast
+import android.widget.Toast.LENGTH_LONG
 import androidx.appcompat.app.AppCompatActivity
 import androidx.core.app.NotificationCompat
 
@@ -52,6 +59,26 @@ class MainActivity : AppCompatActivity(), MyListener {
                 mNotificationManager.notify(System.currentTimeMillis().toInt(), mBuilder.build())
             }
         })
+
+        if (VerifyNotificationPermission() == false) {
+            Toast.makeText(this, "the listener needs permission", LENGTH_LONG).show()
+            Handler(Looper.getMainLooper()).postDelayed({
+                val intent = Intent("android.settings.ACTION_NOTIFICATION_LISTENER_SETTINGS")
+                startActivity(intent)
+            }, 1500)
+
+        }
+    }
+
+    fun VerifyNotificationPermission(): Boolean? {
+        val theList = Settings.Secure.getString(contentResolver, "enabled_notification_listeners")
+        val theListList = theList.split(":").toTypedArray()
+        val me: String = ComponentName(this, NotificationService::class.java).flattenToString()
+        for (next in theListList) {
+            Log.i("+++", "+++ VerifyNotificationPermission(), next: $next, me: $me")
+            if (me == next) return true
+        }
+        return false
     }
 
     override fun onCreateOptionsMenu(menu: Menu?): Boolean {
