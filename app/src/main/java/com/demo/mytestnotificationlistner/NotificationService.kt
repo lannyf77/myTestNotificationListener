@@ -13,6 +13,11 @@ class NotificationService : NotificationListenerService() {
         context = applicationContext
     }
 
+    /**
+     * if no android:permission = "android.permission.BIND_NOTIFICATION_LISTENER_SERVICE"
+     * then the NotificationListenerService will not be called
+     */
+
     override fun onNotificationPosted(sbn: StatusBarNotification) {
         Log.i(TAG, "*+++ onNotificationPosted")
         Log.i(
